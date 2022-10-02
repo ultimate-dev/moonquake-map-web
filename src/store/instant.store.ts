@@ -10,6 +10,9 @@ class InstantStoreC {
   wireframeStatus: boolean = false;
   rotationStatus: boolean = true;
 
+  locationIndex: number = -1;
+  creterIndex: number = -1;
+
   constructor() {
     makeAutoObservable(this);
   }

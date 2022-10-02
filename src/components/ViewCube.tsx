@@ -33,12 +33,12 @@ const Viewcube = () => {
       <mesh
         ref={ref}
         raycast={useCamera(virtualCam)}
-        position={[size.width / 2 - 60, size.height / 2 - 60, 0]}
+        position={[-(size.width / 2) + 120, size.height / 2 - 120, 0]}
         onPointerOut={(e) => set(null)}
         onPointerMove={(e) => set(Math.floor(e.faceIndex / 2))}
       >
         <meshBasicMaterial color="white" wireframe transparent opacity={0.2} />
-        <boxGeometry args={[30, 30, 30]} />
+        <boxGeometry args={[120, 120, 120]} />
       </mesh>
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} intensity={0.5} />

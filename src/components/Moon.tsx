@@ -9,7 +9,7 @@ const Moon = forwardRef(({ wireframe }: any, ref: any) => {
   const [colorMap, unitMap] = useLoader(TextureLoader, [MoonColorTexture, MoonUnitTexture]);
   return (
     <mesh ref={ref} position={[0, 0, 0]} >
-      <sphereGeometry args={[window.innerWidth / 600, 32, 32]} />
+      <sphereGeometry args={[window.innerWidth / 400, 32, 32]} />
       <meshPhongMaterial
         map={colorMap}
         bumpMap={unitMap}

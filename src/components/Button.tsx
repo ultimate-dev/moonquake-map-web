@@ -27,9 +27,9 @@ const Ripple = (props: RippleProps) => {
 };
 const Button = ({ onClick, children }: any) => {
   return (
-    <div className="border-white border border-opacity-20 rounded">
-      <Ripple onClick={onClick} className="p-2">
-        <span>{children}</span>
+    <div className="border-white border border-opacity-20 m-1 rounded">
+      <Ripple onClick={onClick} className="px-4 py-2">
+        <span className="opacity-60">{children}</span>
       </Ripple>
     </div>
   );

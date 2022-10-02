@@ -19,10 +19,14 @@ function App() {
   const lightRef: any = useRef();
   let [locations, setLocations] = useState(null);
   let [craters, setCraters] = useState(null);
+  let [centers, setCenters] = useState(null);
   let { camera } = useThree();
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
-    if (IStore.rotationStatus) groupRef.current.rotation.y = elapsedTime / 20;
+
+    if (IStore.rotationStatus) {
+      groupRef.current.rotation.y = elapsedTime / 20;
+    }
     document.body.onkeyup = function (e) {
       if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
         IStore.rotationStatus = !IStore.rotationStatus;
@@ -43,9 +47,16 @@ function App() {
     let { data } = await axios.get(APIS.CRATERS.rawValue);
     setCraters(data);
   };
+
+  const getCenters = async () => {
+    let { data } = await axios.get(APIS.CENTERS.rawValue);
+    console.log(data);
+    setCenters(data);
+  };
   useEffect(() => {
     getLocations();
     getCreaters();
+    getCenters();
   }, []);
 
   function calcPosFromLatLonRad(lat, lon, radius) {
@@ -75,9 +86,13 @@ function App() {
                 position={calcPosFromLatLonRad(
                   parseFloat(Object.values(locations["Lat"])[index]),
                   parseFloat(Object.values(locations["Long"])[index]),
-                  window.innerWidth / 600
+                  window.innerWidth / 400
                 )}
                 color="red"
+                onClick={() => {
+                  IStore.creterIndex = -1;
+                  IStore.locationIndex = index;
+                }}
               />
             );
           })}
@@ -93,31 +108,54 @@ function App() {
                   position={calcPosFromLatLonRad(
                     parseFloat(Object.values(craters["Center_Latitude"])[index]),
                     parseFloat(Object.values(craters["Center_Longitude"])[index]),
-                    window.innerWidth / 600
+                    window.innerWidth / 400
                   )}
                   color="blue"
+                  onClick={() => {
+                    IStore.creterIndex = index;
+                    IStore.locationIndex = -1;
+                  }}
                 />
               );
             })}
+
+        {centers &&
+          centers.map((item, index) => {
+            return (
+              <group
+                position={calcPosFromLatLonRad(
+                  parseFloat(item[0]),
+                  parseFloat(item[1]),
+                  window.innerWidth / 400
+                )}
+              >
+                <mesh position={[0, 0, 0]}>
+                  <sphereGeometry args={[1.1, 10, 10]} />
+                  <meshBasicMaterial color="red" transparent opacity={0.1} />
+                </mesh>
+              </group>
+            );
+          })}
+        <OrbitControls
+          ref={controlsRef}
+          enableZoom={true}
+          enablePan={true}
+          enableRotate={true}
+          zoomSpeed={0.6}
+          panSpeed={0.5}
+          rotateSpeed={0.4}
+          onChange={(e) => {
+            IStore.rotationStatus = false;
+          }}
+        />
+        {IStore.helperStatus && (
+          <>
+            <gridHelper rotation={[0, 0, 0]} />
+            <gridHelper rotation={[1.57, 0, 0]} />
+          </>
+        )}
       </group>
-      <OrbitControls
-        ref={controlsRef}
-        enableZoom={true}
-        enablePan={true}
-        enableRotate={true}
-        zoomSpeed={0.6}
-        panSpeed={0.5}
-        rotateSpeed={0.4}
-        onChange={(e) => {
-          IStore.rotationStatus = false;
-        }}
-      />
-      {IStore.helperStatus && (
-        <>
-          <gridHelper rotation={[0, 0, 0]} />
-          <gridHelper rotation={[1.57, 0, 0]} />
-        </>
-      )}
+
       <Viewcube />
     </>
   );
