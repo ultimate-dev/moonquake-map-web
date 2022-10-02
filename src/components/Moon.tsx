@@ -5,12 +5,19 @@ import { TextureLoader } from "three";
 import MoonColorTexture from "assets/images/moon_color.jpeg";
 import MoonUnitTexture from "assets/images/moon_unit.jpeg";
 
-const Moon = forwardRef(({}, ref: any) => {
+const Moon = forwardRef(({ wireframe }: any, ref: any) => {
   const [colorMap, unitMap] = useLoader(TextureLoader, [MoonColorTexture, MoonUnitTexture]);
   return (
-    <mesh ref={ref} position={[0, 0, 0]}>
+    <mesh ref={ref} position={[0, 0, 0]} >
       <sphereGeometry args={[window.innerWidth / 600, 32, 32]} />
-      <meshPhongMaterial map={colorMap} bumpMap={unitMap} bumpScale={0.3}  />
+      <meshPhongMaterial
+        map={colorMap}
+        bumpMap={unitMap}
+        bumpScale={0.3}
+        wireframe={wireframe}
+        //transparent
+        //opacity={0.2}
+      />
     </mesh>
   );
 });

@@ -1,37 +1,51 @@
 // @ts-nocheck
-import { OrbitControls, Stars } from "@react-three/drei";
+import { OrbitControls, Stars, PerspectiveCamera } from "@react-three/drei";
+
 import { useEffect, useRef, useState } from "react";
 // Components
 import Moon from "components/Moon";
 import CordLines from "components/CordLines";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree, createPortal } from "@react-three/fiber";
 import axios, { APIS } from "networking";
-import IStore from "store/instant.store";
 import { observer } from "mobx-react-lite";
 import Pin from "components/Pin";
+import IStore from "store/instant.store";
+import Viewcube from "components/ViewCube";
 
 function App() {
   const moonRef: any = useRef();
   const groupRef: any = useRef();
   const controlsRef: any = useRef();
-  let [data, setData] = useState(null);
-
+  const lightRef: any = useRef();
+  let [locations, setLocations] = useState(null);
+  let [craters, setCraters] = useState(null);
+  let { camera } = useThree();
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
-    groupRef.current.rotation.y = elapsedTime / 12;
+    if (IStore.rotationStatus) groupRef.current.rotation.y = elapsedTime / 20;
+    document.body.onkeyup = function (e) {
+      if (e.key == " " || e.code == "Space" || e.keyCode == 32) {
+        IStore.rotationStatus = !IStore.rotationStatus;
+      }
+    };
+    lightRef.current.position.copy(camera.position);
+    lightRef.current.rotation.copy(camera.rotation);
+
     controlsRef.current.update();
   });
 
-  const getData = async () => {
-    let { data } = await axios.get(APIS.DATA.rawValue);
-    setData(data);
-    Object.values(data["Year"]).map((item, index) => {
-      console.log(Object.values(data["Long"]), Object.values(data["Lat"]));
-    });
+  const getLocations = async () => {
+    let { data } = await axios.get(APIS.LOCATIONS.rawValue);
+    setLocations(data);
   };
 
+  const getCreaters = async () => {
+    let { data } = await axios.get(APIS.CRATERS.rawValue);
+    setCraters(data);
+  };
   useEffect(() => {
-    getData();
+    getLocations();
+    getCreaters();
   }, []);
 
   function calcPosFromLatLonRad(lat, lon, radius) {
@@ -48,22 +62,43 @@ function App() {
   return (
     <>
       <Stars radius={300} depth={60} count={20000} factor={7} saturation={0} fade={true} />
-      <ambientLight color="#f6f3ea" position={[0, 0, 0]} intensity={0.8} />
+      <group ref={lightRef}>
+        <spotLight intensity={1} />
+      </group>
       <group name="planetGroup" ref={groupRef} position={[0, 0, 0]}>
-        <Moon ref={moonRef} />
-        <CordLines />
-        {data &&
-          Object.values(data["Year"])?.map((item, index) => {
+        <Moon ref={moonRef} wireframe={IStore.wireframeStatus} />
+        {IStore.cordLineStatus && <CordLines />}
+        {locations &&
+          Object.values(locations["Year"])?.map((item, index) => {
             return (
               <Pin
                 position={calcPosFromLatLonRad(
-                  parseFloat(Object.values(data["Lat"])[index]),
-                  parseFloat(Object.values(data["Long"])[index]),
+                  parseFloat(Object.values(locations["Lat"])[index]),
+                  parseFloat(Object.values(locations["Long"])[index]),
                   window.innerWidth / 600
                 )}
+                color="red"
               />
             );
           })}
+
+        {craters &&
+          Object.values(craters["Feature_Name"])
+            .filter(
+              (item, index) => Object.values(craters["Feature_Type_Code"])[index] == "AA"
+            )
+            ?.map((item, index) => {
+              return (
+                <Pin
+                  position={calcPosFromLatLonRad(
+                    parseFloat(Object.values(craters["Center_Latitude"])[index]),
+                    parseFloat(Object.values(craters["Center_Longitude"])[index]),
+                    window.innerWidth / 600
+                  )}
+                  color="blue"
+                />
+              );
+            })}
       </group>
       <OrbitControls
         ref={controlsRef}
@@ -73,10 +108,17 @@ function App() {
         zoomSpeed={0.6}
         panSpeed={0.5}
         rotateSpeed={0.4}
-        maxZoom={10}
+        onChange={(e) => {
+          IStore.rotationStatus = false;
+        }}
       />
-      <gridHelper rotation={[0, 0, 0]} />
-      <gridHelper rotation={[1.57, 0, 0]} />
+      {IStore.helperStatus && (
+        <>
+          <gridHelper rotation={[0, 0, 0]} />
+          <gridHelper rotation={[1.57, 0, 0]} />
+        </>
+      )}
+      <Viewcube />
     </>
   );
 }

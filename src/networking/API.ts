@@ -18,7 +18,8 @@ class API {
 }
 
 const apis = {
-  DATA: new API("/api"),
+  LOCATIONS: new API("/api/locations"),
+  CRATERS: new API("/api/craters"),
 };
 
 export default apis;
