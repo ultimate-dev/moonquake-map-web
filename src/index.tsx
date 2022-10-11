@@ -15,7 +15,6 @@ root.render(
   <React.StrictMode>
     <div className="fixed w-screen h-screen bg-body text-default overflow-hidden cursor-grab active:cursor-grabbing">
       <img draggable={false} className="fixed right-8 top-8 w-16 h-16 object-cover" src={require("./assets/images/nasa.png")} />
-      <img draggable={false} className="fixed right-8 top-28 w-16 h-16 object-cover" src={require("./assets/images/space-app.png")} />
       <TopBar />
       <Sidebar />
       <div className="fixed w-full h-full p-4 opacity-20">
