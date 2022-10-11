@@ -11,15 +11,18 @@ import { observer } from "mobx-react-lite";
 import Pin from "components/Pin";
 import IStore from "store/instant.store";
 import Viewcube from "components/ViewCube";
+import locationsData from "data/locations.json";
+import centersData from "data/centers.json";
+import cratersData from "data/craters.json";
 
 function App() {
   const moonRef: any = useRef();
   const groupRef: any = useRef();
   const controlsRef: any = useRef();
   const lightRef: any = useRef();
-  let [locations, setLocations] = useState(null);
-  let [craters, setCraters] = useState(null);
-  let [centers, setCenters] = useState(null);
+  let [locations, setLocations] = useState(locationsData);
+  let [craters, setCraters] = useState(cratersData);
+  let [centers, setCenters] = useState(centersData);
   let { camera } = useThree();
   useFrame(({ clock }) => {
     const elapsedTime = clock.getElapsedTime();
@@ -50,13 +53,12 @@ function App() {
 
   const getCenters = async () => {
     let { data } = await axios.get(APIS.CENTERS.rawValue);
-    console.log(data);
     setCenters(data);
   };
   useEffect(() => {
-    getLocations();
-    getCreaters();
-    getCenters();
+    //getLocations();
+   // getCreaters();
+    //getCenters();
   }, []);
 
   function calcPosFromLatLonRad(lat, lon, radius) {
@@ -99,9 +101,7 @@ function App() {
 
         {craters &&
           Object.values(craters["Feature_Name"])
-            .filter(
-              (item, index) => Object.values(craters["Feature_Type_Code"])[index] == "AA"
-            )
+            .filter((item, index) => Object.values(craters["Feature_Type_Code"])[index] == "AA")
             ?.map((item, index) => {
               return (
                 <Pin

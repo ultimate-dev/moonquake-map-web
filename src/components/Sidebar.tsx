@@ -2,10 +2,12 @@ import { observer } from "mobx-react-lite";
 import axios, { APIS } from "networking";
 import { useEffect, useState } from "react";
 import IStore from "store/instant.store";
+import locationsData from "data/locations.json";
+import centersData from "data/centers.json";
 
 const Sidebar = () => {
-  let [locations, setLocations]: any = useState(null);
-  let [craters, setCraters]: any = useState(null);
+  let [locations, setLocations]: any = useState(locationsData);
+  let [craters, setCraters]: any = useState(centersData);
 
   const getLocations = async () => {
     let { data } = await axios.get(APIS.LOCATIONS.rawValue);
@@ -18,8 +20,8 @@ const Sidebar = () => {
     console.log(data);
   };
   useEffect(() => {
-    getLocations();
-    getCreaters();
+    //getLocations();
+    //getCreaters();
   }, []);
 
   if (IStore.locationIndex > -1)
