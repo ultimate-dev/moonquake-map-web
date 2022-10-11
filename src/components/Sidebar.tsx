@@ -3,11 +3,11 @@ import axios, { APIS } from "networking";
 import { useEffect, useState } from "react";
 import IStore from "store/instant.store";
 import locationsData from "data/locations.json";
-import centersData from "data/centers.json";
+import cratersData from "data/craters.json";
 
 const Sidebar = () => {
   let [locations, setLocations]: any = useState(locationsData);
-  let [craters, setCraters]: any = useState(centersData);
+  let [craters, setCraters]: any = useState(cratersData);
 
   const getLocations = async () => {
     let { data } = await axios.get(APIS.LOCATIONS.rawValue);
